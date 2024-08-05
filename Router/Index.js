@@ -61,11 +61,14 @@ router.post("/Login/Home", async (req, res) => {
         if (!passwordMatch) {
             return res.status(404).json({ message: "Invalid credentials" })
         }
+
         const payload = {
             id: User.id,
             email: User.Email
         }
+
         const token = generateToken(payload)
+
         console.log("token Login", token);
         return res.status(200).json({ message: 'Registration Successful', token: token })
 
@@ -142,11 +145,26 @@ router.put('/UpdateProfile', jwtAuthMiddleware, async (req, res) => {
 router.get("/user/profile", jwtAuthMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
-        const user = await UserModel.findById(userId); // Corrected the variable name
-        if (!user) {
-            return res.status(401).json({ msg: "Unauthorized user" });
+
+        if (userId) {
+            const UserFind = await UserModel.findById(userId)
+
+            if (!UserFind) {
+                return res.status(400).json({ Message: "User Not Found " })
+            }
+
+            let allPosts = [];
+            const PostBlogDate = UserFind.posts
+
+            for (let index = 0; index < PostBlogDate.length; index++) {
+                let findtheidtoPost = await PostBlog.findById(PostBlogDate[index])
+                if (findtheidtoPost) {
+                    allPosts.push(findtheidtoPost);
+                }
+            }
+            return res.status(201).json({ user: UserFind, Blogarr: allPosts })
         }
-        res.status(200).json(user);
+
     } catch (error) {
         console.error(error); // Log the error for debugging purposes
         res.status(500).json({ msg: "Internal server error" });
@@ -250,34 +268,6 @@ router.get("/Blog/Date", async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error" })
-    }
-})
-
-router.get("/BlogPostDate/Profile/:Id", jwtAuthMiddleware, async (req, res) => {
-    try {
-        const UserId = req.params.Id
-        const JwtUserId = req.user.id;
-
-        if (!UserId === JwtUserId) return res.status(201).json({ message: "Unauthorized user" })
-
-        if (UserId) {
-            const UserFind = await UserModel.findById(UserId)
-            let allPosts = [];
-            const PostBlogDate = UserFind.posts
-
-            console.log("PostBlogDate.length :", PostBlogDate.length);
-
-            for (let index = 0; index < PostBlogDate.length; index++) {
-                let findtheidtoPost = await PostBlog.findById(PostBlogDate[index])
-                if (findtheidtoPost) {
-                    allPosts.push(findtheidtoPost);
-                }
-            }
-            return res.status(201).json(allPosts)
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(501).json({ message: "Internal server error" })
     }
 })
 
@@ -386,6 +376,7 @@ router.get("/blog/like/:id", jwtAuthMiddleware, async (req, res) => {
             blog.likes = blog.likes.filter(like => like.like.toHexString() !== userId);
         } else {
             blog.likes.push({ like: userId });
+
         }
         await blog.save();
         const updatedLikes = blog.likes.map(like => like.like.toHexString());
@@ -445,7 +436,7 @@ router.post("/Forgrtpassword/Email", async (req, res) => {
             const info = await transporter.sendMail({
                 from: process.env.FROM,
                 to: `${Email}`,
-                subject: "Hello ✔",
+                subject: "Pradip Jedhe ✔",
                 text: "Hello world?",
                 html: ` <b>Your One time Password (OTP) For Login : ${randomNo}</b><br><br>
                 <spen style="color: red;"> OTP is valid only for 05:00 mins. do not share this OTP with anyone.<br><br>
@@ -517,6 +508,5 @@ router.post("/CreatePassword/:Uid", async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 });
-
 
 export default router
