@@ -132,7 +132,7 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
             let user = await UserModel.findById(loggedInUserId)            
             updatedUserData.Password = user.Password
             await user.save()
-            console.log(user);            
+            console.log("user all :",user);            
         }
 
         const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
@@ -148,7 +148,13 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        console.log("updatedUser :",updatedUser);
+        
+
         return res.status(200).json({ message: "Profile updated successfully", updatedUser: updatedUser });
+
+        
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error' });
