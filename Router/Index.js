@@ -129,8 +129,8 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
             updatedUserData.Salt = Salt
         }
         else {
-            console.log("Not Update Password ");
             updatedUserData.Password = user.Password
+            await user.save()
         }
 
         await user.save()
