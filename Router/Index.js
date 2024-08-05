@@ -135,6 +135,9 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
 
         await user.save()
 
+        console.log("user ",user);
+        
+
         const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
         if (UserEmailExists) {
             const user = await UserModel.findById(loggedInUserId)
