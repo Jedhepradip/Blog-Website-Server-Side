@@ -129,19 +129,15 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
             updatedUserData.Salt = Salt
         }
         else {
+            let user = await UserModel.findById(loggedInUserId)            
             updatedUserData.Password = user.Password
             await user.save()
+            console.log(user);            
         }
-
-        await user.save()
-
-        console.log("user ",user);
-        
 
         const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
         if (UserEmailExists) {
             const user = await UserModel.findById(loggedInUserId)
-            // console.log("user.Email :",user.Email);
             if (!user.Email === UserEmail) return res.status(409).json({ message: 'Email Already Exists' });
         }
 
