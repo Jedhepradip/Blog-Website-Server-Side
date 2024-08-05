@@ -105,8 +105,7 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
     try {
         const loggedInUserId = req.user.id;  // User ID from JWT middlewar
 
-        console.log("okokok");
-
+        console.log(req.body);
 
         if (!loggedInUserId) return res.status(403).json({ message: 'Unauthorized to update this profile' });
 
@@ -117,20 +116,20 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
 
         const user = await UserModel.findById(loggedInUserId);
 
-        console.log("user :", user);
-
-
         if (!UserName) updatedUserData.Name = user.Name
 
         if (!UserEmail) updatedUserData.Email = user.Email
 
         if (UserPassword) {
+            console.log("Updata Password ");
+
             let Salt = await bcrypt.genSalt(11);
             let HasPassword = await bcrypt.hash(UserPassword, Salt);
             updatedUserData.Password = HasPassword
             updatedUserData.Salt = Salt
         }
         else {
+            console.log("Not Update Password ");
             updatedUserData.Password = user.Password
         }
 
