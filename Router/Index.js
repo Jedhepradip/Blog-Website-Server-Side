@@ -9,6 +9,7 @@ import nodemailer from "nodemailer"
 import chalk from "chalk";
 const router = express.Router()
 
+// User Registration 
 router.post('/signin/data', async (req, res) => {
     try {
         let { name, email, password, Cpassword } = req.body;
@@ -46,6 +47,7 @@ router.post('/signin/data', async (req, res) => {
     }
 });
 
+// User Login
 router.post("/Login/Home", async (req, res) => {
     try {
         const { email, password } = await req.body;
@@ -78,6 +80,7 @@ router.post("/Login/Home", async (req, res) => {
     }
 })
 
+// User contact
 router.post("/User/Contact", async (req, res) => {
     try {
         console.log("req body :", req.body);
@@ -97,9 +100,13 @@ router.post("/User/Contact", async (req, res) => {
     }
 })
 
-router.put('/UpdateProfile', jwtAuthMiddleware, async (req, res) => {
+// User Profile Edit
+router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
     try {
         const loggedInUserId = req.user.id;  // User ID from JWT middlewar
+
+        console.log("okokok");
+
 
         if (!loggedInUserId) return res.status(403).json({ message: 'Unauthorized to update this profile' });
 
@@ -109,6 +116,9 @@ router.put('/UpdateProfile', jwtAuthMiddleware, async (req, res) => {
         const UserPassword = updatedUserData.Password
 
         const user = await UserModel.findById(loggedInUserId);
+
+        console.log("user :", user);
+
 
         if (!UserName) updatedUserData.Name = user.Name
 
@@ -120,11 +130,14 @@ router.put('/UpdateProfile', jwtAuthMiddleware, async (req, res) => {
             updatedUserData.Password = HasPassword
             updatedUserData.Salt = Salt
         }
+        else {
+            updatedUserData.Password = user.Password
+        }
 
         const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
         if (UserEmailExists) {
             const user = await UserModel.findById(loggedInUserId)
-            console.log(user.Email);
+            // console.log("user.Email :",user.Email);
             if (!user.Email === UserEmail) return res.status(409).json({ message: 'Email Already Exists' });
         }
 
@@ -142,6 +155,7 @@ router.put('/UpdateProfile', jwtAuthMiddleware, async (req, res) => {
     }
 });
 
+// User Profile Data Send to The Fronted
 router.get("/user/profile", jwtAuthMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -171,39 +185,7 @@ router.get("/user/profile", jwtAuthMiddleware, async (req, res) => {
     }
 });
 
-let AdityaUser;
-
-router.get("/EditProfile/:Id", jwtAuthMiddleware, async (req, res) => {
-    try {
-        const UserId = req.params.Id;
-        const JwtUserId = req.user.id;
-
-        console.log("UserId", UserId);
-        console.log("JwtUserId", JwtUserId);
-
-        if (UserId === JwtUserId) {
-            AdityaUser = await UserModel.findById(JwtUserId)
-            console.log("User", AdityaUser);
-            return res.status(200).json({ message: "Edit Profile data fetch successful", AdityaUser });
-        }
-        return res.status(401).json({ message: "Unauthorized user" })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-});
-
-router.get("/EditProfileUser", async (req, res) => {
-    try {
-        console.log("AdityaUser", AdityaUser);
-        return res.status(200).json({ AdityaUser })
-    } catch (error) {
-        console.log(error);
-        return res.status(501).json({ message: "Internal server error" })
-    }
-})
-
+// Post Blog Img Uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cd) {
         cd(null, 'uploads/')
@@ -214,11 +196,16 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
+// Blog Save to the Database
 router.post("/BlogPost", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
         let userId = req.user.id;
         const { title, Desc, Date } = req.body;
         const user = await UserModel.findById(userId);
+        console.log("user ", user);
+
+        console.log(req.body);
+
         console.log("req.file.originalname :", req.file.originalname);
         if (!user) return res.status(404).json({ message: "User not found" });
         const newPost = new PostBlog({
@@ -242,6 +229,7 @@ router.post("/BlogPost", jwtAuthMiddleware, upload.single('Img'), async (req, re
     }
 });
 
+// Post Blog Delete
 router.delete("/BlogPostDelete/:Id", async (req, res) => {
     try {
         let PostBlogId = req.params.Id
@@ -260,6 +248,7 @@ router.delete("/BlogPostDelete/:Id", async (req, res) => {
     }
 });
 
+// Blog Post Data Send To the Fronted
 router.get("/Blog/Date", async (req, res) => {
     try {
         const PostBlogDate = await PostBlog.find()
@@ -271,6 +260,7 @@ router.get("/Blog/Date", async (req, res) => {
     }
 })
 
+// User Post Blog Edit 
 router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
         const blogId = req.params.bid;
@@ -298,6 +288,7 @@ router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (re
     }
 });
 
+// Show the defualt value to the UI
 router.get("/findBlog/:uid", jwtAuthMiddleware, async (req, res) => {
     try {
         const BlogId = req.params.uid
