@@ -135,12 +135,15 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
             console.log("user all :",user);            
         }
 
-        const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
+        const UserEmailExists = await UserModel.findOne({ Email: updatedUserData.Email });
         console.log("UserEmailExists :",UserEmailExists);
+        console.log("updatedUserData.Email :",updatedUserData.Email);
+        
+        console.log("user.Email == UserEmail :",user.Email == UserEmail);
         
         if (UserEmailExists) {            
             const user = await UserModel.findById(loggedInUserId)
-            console.log("user.Email == UserEmail :",user.Email == UserEmail);
+            
             if (!user.Email === UserEmail) return res.status(409).json({ message: 'Email Already Exists' });
         }
 
@@ -269,6 +272,8 @@ router.get("/Blog/Date", async (req, res) => {
 router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
         const blogId = req.params.bid;
+        console.log("rani :",blogId);
+        
         let { title, Desc, Date } = req.body;
 
         const blog = await PostBlog.findById(blogId);
