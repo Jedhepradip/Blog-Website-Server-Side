@@ -136,8 +136,11 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         }
 
         const UserEmailExists = await UserModel.findOne({ Email: UserEmail });
-        if (UserEmailExists) {
+        console.log("UserEmailExists :",UserEmailExists);
+        
+        if (UserEmailExists) {            
             const user = await UserModel.findById(loggedInUserId)
+            console.log("user.Email == UserEmail :",user.Email == UserEmail);
             if (!user.Email === UserEmail) return res.status(409).json({ message: 'Email Already Exists' });
         }
 
@@ -148,12 +151,8 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        console.log("updatedUser :",updatedUser);
-        
-
+        console.log("updatedUser :",updatedUser);        
         return res.status(200).json({ message: "Profile updated successfully", updatedUser: updatedUser });
-
         
     } catch (error) {
         console.error(error);
