@@ -107,7 +107,7 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
 
         console.log(req.body);
 
-        if (!loggedInUserId) return res.status(403).json({ message: 'Unauthorized to update this profile' });
+        if (!loggedInUserId) return res.status(403).json({ Message: 'Unauthorized to update this profile' });
 
         let updatedUserData = req.body;
         const UserEmail = updatedUserData.Email
@@ -144,7 +144,7 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         if (UserEmailExists) {            
             const user = await UserModel.findById(loggedInUserId)
             
-            if (!user.Email === UserEmail) return res.status(409).json({ message: 'Email Already Exists' });
+            if (!user.Email === UserEmail) return res.status(409).json({ Message: 'Email Already Exists' });
         }
 
         const updatedUser = await UserModel.findByIdAndUpdate(loggedInUserId, updatedUserData, {
@@ -152,14 +152,14 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         })
 
         if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ Message: 'User not found' });
         }
         console.log("updatedUser :",updatedUser);        
-        return res.status(200).json({ message: "Profile updated successfully", updatedUser: updatedUser });
+        return res.status(200).json({ Message: "Profile updated successfully", updatedUser: updatedUser });
         
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ Message: 'Internal server error' });
     }
 });
 
@@ -307,7 +307,7 @@ router.get("/findBlog/:uid", jwtAuthMiddleware, async (req, res) => {
 
         const blog = await PostBlog.findById(BlogId)
 
-        if (!blog) return res.status(404).json({ msg: "Blog not found" });
+        if (!blog) return res.status(404).json({ Message: "Blog not found" });
 
         console.log("blog", blog);
 
@@ -315,7 +315,7 @@ router.get("/findBlog/:uid", jwtAuthMiddleware, async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.status(501).json({ message: "Internal Server Error" })
+        return res.status(501).json({ Message: "Internal Server Error" })
     }
 })
 
