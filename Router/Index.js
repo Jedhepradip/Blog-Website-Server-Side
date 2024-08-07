@@ -272,7 +272,7 @@ router.get("/Blog/Date", async (req, res) => {
 router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
         const blogId = req.params.bid;
-        console.log("rani :",blogId);
+        console.log("rani hh:",blogId);
         
         let { title, Desc, Date } = req.body;
 
