@@ -8,6 +8,7 @@ import multer from "multer";
 import nodemailer from "nodemailer"
 import chalk from "chalk";
 const router = express.Router()
+import cloudinary from "cloudinary"
 
 // User Registration 
 router.post('/signin/data', async (req, res) => {
@@ -203,6 +204,14 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage });
 
+
+//image store in cloud
+cloudinary.config({ 
+  cloud_name: process.env.cloud_name, 
+  api_key: process.env.api_key, 
+  api_secret: process.env.api_secret
+});
+
 // Blog Save to the Database
 router.post("/BlogPost", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
@@ -213,10 +222,12 @@ router.post("/BlogPost", jwtAuthMiddleware, upload.single('Img'), async (req, re
 
         console.log(req.body);
 
+        const resultUrl = await cloudinary.uploader.upload(req.file.path)
+
         console.log("req.file.originalname :", req.file.originalname);
         if (!user) return res.status(404).json({ message: "User not found" });
         const newPost = new PostBlog({
-            Image: req.file.originalname,
+            Image: resultUrl.secure_url,
             Title: title,
             Desc: Desc,
             Date: Date,
