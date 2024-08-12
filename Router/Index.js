@@ -72,7 +72,7 @@ router.post("/Login/Home", async (req, res) => {
         const token = generateToken(payload)
 
         console.log("token Login", token);
-        return res.status(200).json({ message: 'Registration Successful', token: token })
+        return res.status(200).json({ message: 'Login Successful', token: token })
 
     } catch (error) {
         console.log(error);
@@ -122,28 +122,27 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
 
         if (UserPassword) {
             console.log("Updata Password ");
-
             let Salt = await bcrypt.genSalt(11);
             let HasPassword = await bcrypt.hash(UserPassword, Salt);
             updatedUserData.Password = HasPassword
             updatedUserData.Salt = Salt
         }
         else {
-            let user = await UserModel.findById(loggedInUserId)            
+            let user = await UserModel.findById(loggedInUserId)
             updatedUserData.Password = user.Password
             await user.save()
-            console.log("user all :",user);            
+            console.log("user all :", user);
         }
 
         const UserEmailExists = await UserModel.findOne({ Email: updatedUserData.Email });
-        console.log("UserEmailExists :",UserEmailExists);
-        console.log("updatedUserData.Email :",updatedUserData.Email);
-        
-        console.log("user.Email == UserEmail :",user.Email == UserEmail);
-        
-        if (UserEmailExists) {            
+        console.log("UserEmailExists :", UserEmailExists);
+        console.log("updatedUserData.Email :", updatedUserData.Email);
+
+        console.log("user.Email == UserEmail :", user.Email == UserEmail);
+
+        if (UserEmailExists) {
             const user = await UserModel.findById(loggedInUserId)
-            
+
             if (!user.Email === UserEmail) return res.status(409).json({ Message: 'Email Already Exists' });
         }
 
@@ -154,9 +153,9 @@ router.put('/User/Profile/Edit', jwtAuthMiddleware, async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ Message: 'User not found' });
         }
-        console.log("updatedUser :",updatedUser);        
+        console.log("updatedUser :", updatedUser);
         return res.status(200).json({ Message: "Profile updated successfully", updatedUser: updatedUser });
-        
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ Message: 'Internal server error' });
@@ -272,8 +271,8 @@ router.get("/Blog/Date", async (req, res) => {
 router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (req, res) => {
     try {
         const blogId = req.params.bid;
-        console.log("rani hh:",blogId);
-        
+        console.log("rani hh:", blogId);
+
         let { title, Desc, Date } = req.body;
 
         const blog = await PostBlog.findById(blogId);
@@ -336,10 +335,14 @@ router.post("/comment/blog/:id", jwtAuthMiddleware, async (req, res) => {
     }
 });
 
+//BLog Comments
 router.get("/blog/comments/:Id", jwtAuthMiddleware, async (req, res) => {
     try {
         const BlogId = req.params.Id;
         const user = req.user.id
+
+        console.log(BlogId);
+        console.log(req.body);
 
         const BLog = await PostBlog.findById(BlogId);
         if (!BLog) return res.status(404).json({ message: "Blog Not Found" });
@@ -362,6 +365,7 @@ router.get("/blog/comments/:Id", jwtAuthMiddleware, async (req, res) => {
     }
 });
 
+//Blog Likes
 router.get("/blog/like/:id", jwtAuthMiddleware, async (req, res) => {
     try {
         const blogId = req.params.id;
@@ -388,6 +392,7 @@ router.get("/blog/like/:id", jwtAuthMiddleware, async (req, res) => {
     }
 });
 
+//Comment Delete
 router.put("/:blogId/BlogId/:bid", jwtAuthMiddleware, async (req, res) => {
     try {
         const BlogId = req.params.bid
@@ -409,6 +414,7 @@ router.put("/:blogId/BlogId/:bid", jwtAuthMiddleware, async (req, res) => {
     }
 })
 
+// OTP send Email
 let randomNo;
 router.post("/Forgrtpassword/Email", async (req, res) => {
     try {
@@ -466,6 +472,7 @@ router.post("/Forgrtpassword/Email", async (req, res) => {
     }
 })
 
+//OTP Verfind
 router.post("/Forgrtpassword/OTP", async (req, res) => {
     try {
         const EmailOTP = req.body.otp;
@@ -482,6 +489,7 @@ router.post("/Forgrtpassword/OTP", async (req, res) => {
     }
 });
 
+// Forget Password
 router.post("/CreatePassword/:Uid", async (req, res) => {
     try {
         const UserId = req.params.Uid;

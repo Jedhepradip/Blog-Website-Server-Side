@@ -18,6 +18,10 @@ const userSchema = new Schema({
     Cpassword: {
         type: String,
     },
+    IsAdmine: {
+        type: Boolean,
+        default: false
+    },
     posts: [{ type: Schema.Types.ObjectId, ref: 'Blog' }],
     Comment: [{ type: Schema.Types.ObjectId, ref: "Comment" }]
 });
