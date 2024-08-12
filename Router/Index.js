@@ -288,12 +288,14 @@ router.put("/blog/edit/:bid", jwtAuthMiddleware, upload.single('Img'), async (re
 
         const blog = await PostBlog.findById(blogId);
 
+        const resultUrl = await cloudinary.uploader.upload(req.file.path)
+
         if (!blog) return res.status(404).json({ msg: "Blog not found" });
 
         if (!title) { title = blog.Title }
         if (!Desc) { Desc = blog.Desc }
         if (!Date) { Date = blog.Date }
-        if (req.file) { blog.Image = req.file.originalname }
+        if (req.file) { blog.Image = resultUrl.secure_url }
 
         blog.Title = title;
         blog.Desc = Desc;
